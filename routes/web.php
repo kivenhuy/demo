@@ -1,28 +1,10 @@
 <?php
 
-use App\Http\Controllers\Admin\CropActivityController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\CommuneController;
-use App\Http\Controllers\CountryController;
-use App\Http\Controllers\DistrictController;
-use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\Admin\HomeController;
-use App\Http\Controllers\Admin\SeasonMasterController;
-use App\Http\Controllers\StaffController;
-use App\Http\Controllers\FarmersController;
-use App\Http\Controllers\Admin\CropMasterController;
-use App\Http\Controllers\Admin\CropStageController;
-use App\Http\Controllers\CatalogueValueController;
-use App\Http\Controllers\Admin\CropCalendarController;
-use App\Http\Controllers\AjaxOptionsController;
-use App\Http\Controllers\CropVarietyController;
-use App\Http\Controllers\FarmLandController;
-use App\Http\Controllers\LogActivitiesController;
-use App\Http\Controllers\ReportController;
-use App\Models\CatalogueValue;
-use App\Models\CropVariety;
-use App\Models\FarmLand;
-use App\Models\LogActivities;
+use App\Http\Controllers\SchoolCLassController;
+use App\Http\Controllers\StudentsController;
+use App\Models\SchoolCLass;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function(){
@@ -39,89 +21,26 @@ Route::group(["prefix"=> ""], function () {
 
 
 Route::group(['middleware' => ['auth']], function () {
-    Route::get('ajax-option-get-provinces', [AjaxOptionsController::class,'getProvinces'])->name('ajax_options.get-provinces');
-    Route::get('ajax-option-get-districts', [AjaxOptionsController::class,'getDistricts'])->name('ajax_options.get-districts');
 
     Route::get("/dashboard", [HomeController::class, 'dashboard'])->name('dashboard');
-    Route::resource('season-masters', SeasonMasterController::class)->names('season-masters');
-    Route::resource('crop-informations', CropMasterController::class);
-    Route::resource('catalogue-values', CatalogueValueController::class)->only('index');
-    
-    Route::resource('crop-stages', CropStageController::class);
-    Route::post('update-crop-stage-status', [CropStageController::class, 'updateStatus'])->name('crop_stage.update_status');
-    Route::resource('crop-activities', CropActivityController::class);
-    Route::post('update-crop-activity-status', [CropActivityController::class, 'updateStatus'])->name('crop_activity.update_status');
-    
-    Route::resource('crop-calendars', CropCalendarController::class);
-    Route::get('ajax-get-calendar-view', [CropCalendarController::class, 'ajaxGetCalendarView'])->name('ajax.get-calendar-view');
-    Route::post('update-crop-calendar-status', [CropCalendarController::class, 'updateStatus'])->name('crop_calendar.update_status');
 
-     // Farmer Details
-    Route::get("/farmer", [FarmersController::class, 'index'])->name('farmer.index');
-    Route::get("/farmer_location", [FarmersController::class, 'farmer_location'])->name('farmer_location.index');
-    Route::get("/farmer/dtajax", [FarmersController::class, 'dtajax'])->name('farmer.dtajax');
-    Route::get("/farmer/distribute_transation", [FarmersController::class, 'distribute_transation'])->name('farmer.distribute_transation');
-    Route::get("/farmer/{id}", [FarmersController::class, 'show'])->name('farmer.show');
-    Route::post("/import-csv", [FarmersController::class, 'importCSV'])->name('farmer.import_csv');
+    // CLasses
+    Route::get("/class", [SchoolCLassController::class, 'index'])->name('class.index');
+    Route::get("/class/dtajax", [SchoolCLassController::class, 'dtajax'])->name('class.dtajax');
+    Route::get("/class/create", [SchoolCLassController::class, 'create'])->name('class.create');
+    Route::post("/add_class", [SchoolCLassController::class, 'store'])->name('class.store');
+    Route::get("/class/edit/{id}", [SchoolCLassController::class, 'edit'])->name('class.edit');
+    Route::get("/class/show/{id}", [SchoolCLassController::class, 'show'])->name('class.show');
+    Route::post("/class/update", [SchoolCLassController::class, 'update'])->name('class.update');
 
-    //Country
-    Route::get("/country", [CountryController::class, 'index'])->name('country.index');
-    Route::get("/country/dtajax", [CountryController::class, 'dtajax'])->name('country.dtajax');
-    Route::get("/country/create", [CountryController::class, 'create'])->name('country.create');
-    Route::post("/add_country", [CountryController::class, 'store'])->name('country.store');
+    // Student
+    Route::get("/student", [StudentsController::class, 'index'])->name('student.index');
+    Route::get("/student/dtajax", [StudentsController::class, 'dtajax'])->name('student.dtajax');
+    Route::get("/student/create", [StudentsController::class, 'create'])->name('student.create');
+    Route::post("/add_student", [StudentsController::class, 'store'])->name('student.store');
+    Route::get("/student/edit/{id}", [StudentsController::class, 'edit'])->name('student.edit');
+    Route::get("/student/show/{id}", [StudentsController::class, 'show'])->name('student.show');
+    Route::post("/student/update", [StudentsController::class, 'update'])->name('student.update');
 
-    // Staff
-    Route::get("/staff", [StaffController::class, 'index'])->name('staff.index');
-    Route::get("/staff/dtajax", [StaffController::class, 'dtajax'])->name('staff.dtajax');
-    Route::get("/staff/create", [StaffController::class, 'create'])->name('staff.create');
-    Route::post("/add_staff", [StaffController::class, 'store'])->name('staff.store');
-
-
-    //Province
-    Route::get("/province", [ProvinceController::class, 'index'])->name('province.index');
-    Route::get("/province/dtajax", [ProvinceController::class, 'dtajax'])->name('province.dtajax');
-    Route::get("/province/create", [ProvinceController::class, 'create'])->name('province.create');
-    Route::post("/add_province", [ProvinceController::class, 'store'])->name('province.store');
-    Route::get("/province_filter_by_country/{id}", [ProvinceController::class, 'filter_by_country'])->name('province.filter_by_country');
-
-    //District
-    Route::get("/district", [DistrictController::class, 'index'])->name('district.index');
-    Route::get("/district/dtajax", [DistrictController::class, 'dtajax'])->name('district.dtajax');
-    Route::get("/district/create", [DistrictController::class, 'create'])->name('district.create');
-    Route::post("/add_district", [DistrictController::class, 'store'])->name('district.store');
-    Route::get("/district_filter_by_province/{id}", [DistrictController::class, 'filter_by_province'])->name('district.filter_by_province');
-
-    //Commune
-    Route::get("/commune", [CommuneController::class, 'index'])->name('commune.index');
-    Route::get("/commune/dtajax", [CommuneController::class, 'dtajax'])->name('commune.dtajax');
-    Route::get("/commune/create", [CommuneController::class, 'create'])->name('commune.create');
-    Route::post("/add_commune", [CommuneController::class, 'store'])->name('commune.store');
-    Route::get("/commnue_filter_by_district/{id}", [CommuneController::class, 'filter_by_district'])->name('commnue.filter_by_district');
-    
-    //Log Activities
-    Route::get("/staff_activities", [LogActivitiesController::class, 'index'])->name('log_activities.index');
-    // Route::get("/commune/dtajax", [LogActivities::class, 'dtajax'])->name('commune.dtajax');
-    // Route::get("/commune/create", [LogActivities::class, 'create'])->name('commune.create');
-    // Route::post("/add_commune", [LogActivities::class, 'store'])->name('commune.store');
-    // Route::get("/commnue_filter_by_district/{id}", [LogActivities::class, 'filter_by_district'])->name('commnue.filter_by_district');
-
-    // Farm land
-    Route::get("/farm_land", [FarmLandController::class, 'index'])->name('farm_land.index');
-    Route::post("/farm_land/filter_farmland", [FarmLandController::class, 'filter_farmland'])->name('farm_land.filter_farmland');
-
-    // Crop Variety
-    Route::get("/crop_variety", [CropVarietyController::class, 'index'])->name('crop_variety.index');
-    Route::get("/crop_variety/create", [CropVarietyController::class, 'create'])->name('crop_variety.create');
-    Route::post("/crop_variety/store", [CropVarietyController::class, 'store'])->name('crop_variety.store');
-    Route::get("/crop_variety/dtajax", [CropVarietyController::class, 'dtajax'])->name('crop_variety.dtajax');
-
-    // Report
-    Route::get("/farmer_report", [ReportController::class, 'farmer_report'])->name('farmer_report.index');
-    Route::get("/farmer_report/farmer_report_ajax", [ReportController::class, 'farmer_report_ajax'])->name('farmer_report.farmer_report_ajax');
-    Route::get("/farmland_report", [ReportController::class, 'farmland_report'])->name('farmland_report.index');
-    Route::get("/farmland_report/farmland_report_ajax", [ReportController::class, 'farmland_report_ajax'])->name('farmer_report.farmland_report_ajax');
-    Route::get("/farmland_report/singel_farmland_location/{id}", [ReportController::class, 'singel_farmland_location'])->name('farmer_report.singel_farmland_location');
-    Route::get("/cultivation_report", [ReportController::class, 'cultivation_report'])->name('cultivation_report.index');
-    Route::get("/cultivation_report/cultivation_report_ajax", [ReportController::class, 'cultivation_report_ajax'])->name('farmer_report.cultivation_report_ajax');
 });
 
